@@ -6,15 +6,20 @@ dotenv.config({ path: path.resolve(__dirname, "../.env") });
 const Koa = require("koa");
 const Router = require("koa-router");
 const koaBody = require("koa-body");
-// const logger = require("koa-pino-logger");
+
+const { HttpError } = require("http-errors");
 
 const middleware = require("./middleware");
 
 const app = new Koa();
 
 app.use(async (ctx, next) => {
-    ctx.body = {};
-    await next();
+    try {
+        ctx.body = {};
+        await next();
+    } catch(e) {
+        if(!(e instanceof HttpError)) { throw e; }
+    }
 });
 
 app.use(koaBody());
