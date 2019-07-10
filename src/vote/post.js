@@ -2,8 +2,7 @@ module.exports = async (ctx) => {
     const { id, vote } = ctx.request.body;
 
     // validate form
-    if(typeof id != "string" || id.length != 8 // id must be a 8 char string
-       || typeof vote != "number" // vote must be number
+    if(typeof id != "string" || typeof vote != "number" // vote must be number
        // and should be between 0 and candidate - 1
        || vote < 0 || vote >= parseInt(process.env.CANDIDATE, 10)) {
         ctx.body.status = false;
