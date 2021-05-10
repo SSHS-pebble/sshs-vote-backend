@@ -1,18 +1,14 @@
 const { MongoClient } = require("mongodb");
-const url = `mongodb://${process.env.DB_USER}:${
-    process.env.DB_PW
-}@ds221115.mlab.com:21115/sshs-vote`;
 let client = null;
-
-(async () => {
-    client = await MongoClient.connect(url, { useNewUrlParser: true });
-    console.log("Connected to DB");
-})();
 
 module.exports = {
     getDB: async (ctx, next) => {
+        if(!client || !client.isConnected()) {
+            client = await MongoClient.connect(process.env.DB_STRING, { useUnifiedTopology: true });
+            console.log("Database Connected");
+        }
         ctx.state.client = client;
-        ctx.state.db = ctx.state.client.db("sshs-vote");
+        ctx.state.db = ctx.state.client.db("Vote");
         ctx.state.collections = {};
         ctx.state.collections.students = ctx.state.db.collection("students");
         await next();

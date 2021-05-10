@@ -7,10 +7,6 @@ const nanoid = require("nanoid");
 const { MongoClient } = require("mongodb");
 const ora = require("ora");
 
-const url = `mongodb://${process.env.DB_USER}:${
-    process.env.DB_PW
-}@ds221115.mlab.com:21115/sshs-vote`;
-
 const studentList = new Array(parseInt(process.env.STUDENT, 10)).fill().map(() => ({
     id: nanoid(8),
     vote: -1
@@ -21,16 +17,17 @@ const studentList = new Array(parseInt(process.env.STUDENT, 10)).fill().map(() =
     if(!process.stdout.isTTY) { ttyCheckSpinner.succeed("Stdout is file!"); }
     else { ttyCheckSpinner.warn("Stdout is terminal, consider redirection."); }
     const DBSpinner = ora("Connecting to database...").start();
-    const client = await MongoClient.connect(url, { useNewUrlParser: true });
+    const client = await MongoClient.connect(process.env.DB_STRING, { useUnifiedTopology: true });
     DBSpinner.succeed("Connected to database!");
     const insertSpinner = ora("Inserting ids to database...").start();
-    const db = client.db("sshs-vote");
+    const db = client.db("Vote");
     const students = db.collection("students");
     await students.drop();
     await students.insertMany(studentList);
     insertSpinner.succeed("Inserted all generated ids!");
     const logSpinner = ora("Printing all ids to stdout!").start();
-    studentList.forEach(val => {
+    const shuffleStudent = studentList.map((a) => ({sort: Math.random(), value: a})).sort((a, b) => a.sort - b.sort).map((a) => a.value)
+    shuffleStudent.forEach(val => {
         console.log(val.id);
     });
     logSpinner.succeed("Finished printing ids!");

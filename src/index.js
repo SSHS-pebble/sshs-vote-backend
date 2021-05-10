@@ -32,7 +32,7 @@ router.get("/vote", require("./vote/get.js"));
 app.use(router.routes());
 app.use(router.allowedMethods());
 
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 4000;
 
 const server = app.listen(PORT);
 
